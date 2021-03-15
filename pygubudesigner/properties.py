@@ -157,6 +157,9 @@ TK_WIDGET_OPTIONS = {
         'editor': 'choice',
         'params': {'values': ('', tk.W, tk.CENTER, tk.E), 'state': 'readonly'},
         'default': tk.W},
+    'columnbreak': {
+        'editor': 'choice',
+        'params': {'values': ('', 'false', 'true'), 'state': 'readonly'}},
     'command': {
         'editor': 'dynamic',
         'params': {'mode': 'commandentry'},
@@ -168,7 +171,10 @@ TK_WIDGET_OPTIONS = {
              },
         'tk.Scale': {
              'params': {'mode': 'scalecommandentry'}
-             },        
+             },
+        'tk.OptionMenu': {
+             'params': {'mode': 'simplecommandentry'}
+             },
         },
     # ttk.Label
     'compound': {
@@ -268,6 +274,9 @@ TK_WIDGET_OPTIONS = {
         },
         'pygubu.builder.widgets.dialog': {'default': 100}
         },
+    'hidemargin': {
+        'editor': 'choice',
+        'params': {'values': ('', 'false', 'true'), 'state': 'readonly'}},
     'highlightbackground': {
         'editor': 'colorentry'},
     'highlightcolor': {
@@ -787,14 +796,14 @@ WIDGET_SPECIFIC_OPTIONS = (
     'autoseparators', 'background', 'bigincrement',
     'blockcursor', 'borderwidth', 'buttonbackground', 'buttoncursor',
     'buttondownrelief', 'buttonuprelief',
-    'class_', 'column_anchor', 'command', 'compound', 'container',
+    'class_', 'column_anchor', 'columnbreak', 'command', 'compound', 'container',
     'closeenough', 'confine', 'default', 'digits', 'direction',
     'disabledbackground', 'disabledforeground', 'elementborderwidth',
     'endline', 'exportselection', 'font',
     'foreground', 'format', 'from_', 'to',
-    'inactiveselectbackground', 'increment', 'insertunfocussed',
-    'invalidcommand', 'justify', 'handlepad', 'handlesize',
-    'heading_anchor', 'height', 'image', 'indicatoron',
+    'handlepad', 'handlesize', 'hidemargin', 'heading_anchor', 'height', 'image',
+    'inactiveselectbackground', 'increment', 'indicatoron', 'insertunfocussed',
+    'invalidcommand', 'justify',
     'label', 'labelanchor', 'listvariable', 'length',
     'maximum', 'maxundo',
     'minsize', 'minwidth', 'mode', 'offrelief', 'offvalue',
@@ -809,7 +818,7 @@ WIDGET_SPECIFIC_OPTIONS = (
     'text', 'textvariable', 'tickinterval', 'tristateimage',
     'tristatevalue', 'underline', 'validate', 'undo', 'validatecommand',
     'value', 'values', 'variable', 'weight', 'width', 'wrap',
-    'wraplength', 'xscrollincrement', 'yscrollincrement',
+    'wraplength', 'xscrollcommand', 'xscrollincrement', 'yscrollincrement',
     'tearoff', 'tearoffcommand'
     )
 
