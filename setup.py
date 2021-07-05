@@ -132,7 +132,9 @@ setup(
             'images/images-png/*.png',
             'images/images-png/widgets/*/*.png',
             'ui/*.ui',
-            'locale/*/*/*.mo'],
+            'locale/*/*/*.mo',
+            'template/*.mako',
+            ],
     },
     entry_points={
         'gui_scripts': [
@@ -144,6 +146,7 @@ setup(
     },
     install_requires=[
         'appdirs>=1.3',
+        'Mako>=1.1.4',
         'pygubu>={0}'.format(PYGUBU_VERSION)],
     classifiers=[
         "Programming Language :: Python",

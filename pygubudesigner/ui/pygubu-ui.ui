@@ -789,69 +789,120 @@
                                     </child>
                                     <child>
                                       <object class="ttk.Labelframe" id="lfoptions">
-                                        <property name="height">200</property>
+                                        <property name="height">120</property>
                                         <property name="padding">4</property>
                                         <property name="text" translatable="yes">Options:</property>
-                                        <property name="width">200</property>
+                                        <property name="width">100</property>
                                         <layout manager="pack">
                                           <property name="fill">x</property>
-                                          <property name="propagate">True</property>
+                                          <property name="propagate">False</property>
                                           <property name="side">top</property>
                                         </layout>
                                         <child>
-                                          <object class="ttk.Label" id="lbl_wlist">
-                                            <property name="text" translatable="yes">Main widget:</property>
-                                            <layout manager="grid">
-                                              <property name="column">0</property>
+                                          <object class="pygubu.builder.widgets.scrolledframe" id="scrolledframe1">
+                                            <property name="scrolltype">both</property>
+                                            <property name="usemousewheel">false</property>
+                                            <layout manager="pack">
+                                              <property name="expand">true</property>
+                                              <property name="fill">both</property>
                                               <property name="propagate">True</property>
-                                              <property name="row">0</property>
+                                              <property name="side">top</property>
                                             </layout>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="pygubu.builder.widgets.combobox" id="widgetlist">
-                                            <property name="keyvariable">string:widgetlist_keyvar</property>
-                                            <property name="textvariable">string:widgetlistvar</property>
-                                            <layout manager="grid">
-                                              <property name="column">1</property>
-                                              <property name="row">0</property>
-                                              <property name="sticky">ew</property>
-                                              <property type="col" id="1" name="pad">0</property>
-                                              <property type="col" id="1" name="weight">1</property>
-                                            </layout>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="ttk.Entry" id="classname">
-                                            <property name="textvariable">string:classnamevar</property>
-                                            <layout manager="grid">
-                                              <property name="column">1</property>
-                                              <property name="propagate">True</property>
-                                              <property name="row">1</property>
-                                              <property name="sticky">ew</property>
-                                            </layout>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="ttk.Frame" id="spacerframe1">
-                                            <property name="height">10</property>
-                                            <property name="width">10</property>
-                                            <layout manager="grid">
-                                              <property name="column">2</property>
-                                              <property name="propagate">True</property>
-                                              <property name="row">0</property>
-                                              <property type="col" id="2" name="weight">2</property>
-                                            </layout>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="ttk.Label" id="label_2">
-                                            <property name="text" translatable="yes">Class Name:</property>
-                                            <layout manager="grid">
-                                              <property name="column">0</property>
-                                              <property name="propagate">True</property>
-                                              <property name="row">1</property>
-                                            </layout>
+                                            <child>
+                                              <object class="ttk.Frame" id="frame1">
+                                                <property name="height">200</property>
+                                                <property name="width">200</property>
+                                                <layout manager="pack">
+                                                  <property name="fill">x</property>
+                                                  <property name="propagate">True</property>
+                                                  <property name="side">top</property>
+                                                </layout>
+                                                <child>
+                                                  <object class="ttk.Label" id="lbl_wlist">
+                                                    <property name="text" translatable="yes">Main widget:</property>
+                                                    <layout manager="grid">
+                                                      <property name="column">0</property>
+                                                      <property name="propagate">True</property>
+                                                      <property name="row">0</property>
+                                                      <property name="sticky">ew</property>
+                                                      <property type="col" id="0" name="pad">5</property>
+                                                      <property type="row" id="0" name="pad">5</property>
+                                                    </layout>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="pygubu.builder.widgets.combobox" id="widgetlist">
+                                                    <property name="keyvariable">string:widgetlist_keyvar</property>
+                                                    <property name="textvariable">string:widgetlistvar</property>
+                                                    <layout manager="grid">
+                                                      <property name="column">1</property>
+                                                      <property name="propagate">True</property>
+                                                      <property name="row">0</property>
+                                                      <property name="sticky">ew</property>
+                                                      <property type="row" id="0" name="pad">5</property>
+                                                    </layout>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="ttk.Label" id="label_2">
+                                                    <property name="text" translatable="yes">Class Name:</property>
+                                                    <layout manager="grid">
+                                                      <property name="row">1</property>
+                                                      <property name="sticky">ew</property>
+                                                      <property type="col" id="0" name="pad">5</property>
+                                                      <property type="row" id="1" name="pad">5</property>
+                                                    </layout>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="ttk.Entry" id="classname">
+                                                    <property name="textvariable">string:classnamevar</property>
+                                                    <layout manager="grid">
+                                                      <property name="column">1</property>
+                                                      <property name="propagate">True</property>
+                                                      <property name="row">1</property>
+                                                      <property name="sticky">ew</property>
+                                                      <property type="row" id="1" name="pad">5</property>
+                                                    </layout>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="ttk.Frame" id="spacerframe1">
+                                                    <property name="height">10</property>
+                                                    <property name="width">10</property>
+                                                    <layout manager="grid">
+                                                      <property name="column">2</property>
+                                                      <property name="propagate">True</property>
+                                                      <property name="row">1</property>
+                                                      <property type="row" id="1" name="pad">5</property>
+                                                    </layout>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="ttk.Frame" id="frame2">
+                                                <property name="height">200</property>
+                                                <property name="padding">0 5 0 0</property>
+                                                <property name="width">200</property>
+                                                <layout manager="pack">
+                                                  <property name="fill">x</property>
+                                                  <property name="propagate">True</property>
+                                                  <property name="side">top</property>
+                                                </layout>
+                                                <child>
+                                                  <object class="ttk.Checkbutton" id="cb_import_tkvars">
+                                                    <property name="text" translatable="yes">Import Tk Variables</property>
+                                                    <property name="variable">boolean:import_tkvars_var</property>
+                                                    <layout manager="pack">
+                                                      <property name="anchor">w</property>
+                                                      <property name="propagate">True</property>
+                                                      <property name="side">top</property>
+                                                    </layout>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
                                           </object>
                                         </child>
                                       </object>
