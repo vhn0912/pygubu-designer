@@ -14,18 +14,11 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function, unicode_literals
-
 import logging
 
-try:
-    import tkinter as tk
-    import tkinter.ttk as ttk
-    from tkinter import messagebox
-except ImportError:
-    import Tkinter as tk
-    import ttk
-    import tkMessageBox as messagebox
+import tkinter as tk
+import tkinter.ttk as ttk
+from tkinter import messagebox
 
 from pygubu import builder
 from pygubu.widgets.simpletooltip import create as create_tooltip
@@ -55,8 +48,9 @@ class LayoutEditor(PropertiesEditor):
         # Layout Options editors
         self._rcbag = {}  # bag for row/column prop editors
         # main options frame
-        self._fprop = fprop = ttk.Labelframe(self._sframe.innerframe,
-                                             text=_('Options:'), padding=4)
+        # self._fprop = fprop = ttk.Labelframe(self._sframe.innerframe,
+        #                                     text=_('Options:'), padding=4)
+        self._fprop = fprop = ttk.Frame(self._sframe.innerframe)
         fprop.grid(row=0, sticky='nswe')
 
         # Layout selector
@@ -176,6 +170,11 @@ class LayoutEditor(PropertiesEditor):
         else:
             self._current.manager = new_manager
             self.edit(self._current, self._allowed_managers)
+
+            # If we're moving away from grid, remove the row/col values
+            # in the treeview (so the user knows grid is not being used)
+            if old_manager == 'grid':
+                self._sframe.event_generate('<<ClearSelectedGridTreeInfo>>')
 
     def _ask_manager_change(self, old_manager, new_manager):
         title = _('Change Manager')

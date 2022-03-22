@@ -1,26 +1,14 @@
 # encoding: utf-8
-import logging
 import os
-import sys
+import logging
+import tkinter as tk
+from tkinter import filedialog, messagebox
+import configparser
 
-from pygubudesigner.util import get_ttk_style
-
-try:
-    import tkinter as tk
-    from tkinter import filedialog, messagebox, ttk
-except ImportError:
-    import tkFileDialog as filedialog
-    import Tkinter as tk
-    import tkMessageBox as messagebox
-    import ttk
-try:
-    import ConfigParser as configparser
-except ImportError:
-    import configparser
+from appdirs import AppDirs
 
 import pygubu
-from appdirs import AppDirs
-from os import path
+from pygubudesigner.util import get_ttk_style
 from .i18n import translator as _
 
 logger = logging.getLogger(__name__)
@@ -61,7 +49,7 @@ config.add_section(SEC_GENERAL)
 config.add_section(SEC_RECENT_FILES)
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
-TEMPLATE_DIR = os.path.join(CURRENT_DIR, 'template')
+TEMPLATE_DIR = os.path.join(CURRENT_DIR, 'codegen', 'template')
 NEW_STYLE_FILE_TEMPLATE = os.path.join(TEMPLATE_DIR, 'customstyles.py.mako')
 
 
@@ -244,7 +232,7 @@ class PreferencesUI(object):
                         sample_script_contents = tfile.read()
                         f.write(sample_script_contents)
 
-                if path.isfile(fname):
+                if os.path.isfile(fname):
                     msg = _(
                         "File saved.\n\nPlease edit the style definition file.")
                     messagebox.showinfo(_('Styles'), msg)

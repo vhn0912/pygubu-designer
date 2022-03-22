@@ -102,6 +102,7 @@ class WidgetsTreeEditor(object):
         lframe.bind_all('<<LayoutEditorContainerManagerToGrid>>', f)
         f = lambda e, manager='pack': self.change_container_manager(manager)
         lframe.bind_all('<<LayoutEditorContainerManagerToPack>>', f)
+        lframe.bind_all('<<ClearSelectedGridTreeInfo>>', self.clear_selected_grid_tree_info)
 
         # Tree Editing
         tree = self.treeview
@@ -134,6 +135,22 @@ class WidgetsTreeEditor(object):
 
             if do_delete:
                 self.on_treeview_delete_selection(None)
+
+    def clear_selected_grid_tree_info(self, event):
+        """
+        Clear the row/column text in the object treeview
+        for the selected item.
+
+        This gets called when the geometry manager of the
+        currently selected widget changes from grid to pack or to place.
+
+        This does not get used when multiple widgets need to have
+        their geometry managers changed inside a container widget.
+        """
+        if self.current_edit:
+            values = self.treeview.item(self.current_edit, 'values')
+            values = (values[0], '', '')
+            self.treeview.item(self.current_edit, values=values)
 
     def selection_different_parents(self):
         """
@@ -254,7 +271,8 @@ class WidgetsTreeEditor(object):
             for child in children:
                 widget = self.treedata[child]
                 # Don't change widgets with place manager
-                if widget.manager != 'place':
+                # unless the selected widget's manager is being changed.
+                if widget.manager != 'place' or child == item:
                     widget.manager = new_manager  # Change manager
 
                     # update Tree R/C columns
@@ -468,6 +486,10 @@ class WidgetsTreeEditor(object):
                 s=selected_id: self.previewer.show_selected(
                     i,
                     s))
+
+        # No widget/item is currently selected anymore because
+        # we've just deleted selected items from the treeview.
+        self.current_edit = None
 
         # restore filter
         self.filter_restore()
@@ -863,6 +885,7 @@ class WidgetsTreeEditor(object):
             self.treeview.delete(*children)
         self.editor_hide_all()
         self.counter.clear()  # Reset the widget counter (August 19, 2021)
+        self.current_edit = None  # We no longer have a selected item in the treeview
 
     def load_file(self, filename):
         """Load file into treeview"""
@@ -1002,21 +1025,6 @@ class WidgetsTreeEditor(object):
         # whether it makes sense to have some menus enabled or not.
         self.app.evaluate_menu_states()
 
-    def get_max_row_col(self, item):
-        tree = self.treeview
-        max_row = 0
-        max_col = 0
-        children = tree.get_children(item)
-        for child in children:
-            data = self.treedata[child]
-            row = int(data.layout_property('row'))
-            col = int(data.layout_property('column'))
-            if row > max_row:
-                max_row = row
-            if col > max_col:
-                max_col = col
-        return (max_row, max_col)
-
     def update_event(self, hint, obj):
         """Updates tree colums when itemdata is changed."""
 
@@ -1136,27 +1144,24 @@ class WidgetsTreeEditor(object):
                 if data.manager != 'grid':
                     break
 
+                current_row = new_row = int(data.layout_property('row'))
+                current_col = new_col = int(data.layout_property('column'))
                 if direction == self.GRID_UP:
-                    row = int(data.layout_property('row'))
-                    if row > 0:
-                        row = row - 1
-                        data.layout_property('row', str(row))
-                        data.notify()
+                    if current_row > 0:
+                        new_row = current_row - 1
                 elif direction == self.GRID_DOWN:
-                    row = int(data.layout_property('row'))
-                    row = row + 1
-                    data.layout_property('row', str(row))
-                    data.notify()
+                    new_row = current_row + 1
                 elif direction == self.GRID_LEFT:
-                    column = int(data.layout_property('column'))
-                    if column > 0:
-                        column = column - 1
-                        data.layout_property('column', str(column))
-                        data.notify()
+                    if current_col > 0:
+                        new_col = current_col - 1
                 elif direction == self.GRID_RIGHT:
-                    column = int(data.layout_property('column'))
-                    column = column + 1
-                    data.layout_property('column', str(column))
+                    new_col = current_col + 1
+
+                if current_row != new_row:
+                    data.layout_property('row', str(new_row))
+                    data.notify()
+                if current_col != new_col:
+                    data.layout_property('column', str(new_col))
                     data.notify()
                 root = tree.parent(item)
             self.filter_restore()
