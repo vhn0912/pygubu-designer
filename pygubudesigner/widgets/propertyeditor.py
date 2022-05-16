@@ -1,4 +1,3 @@
-# encoding: UTF-8
 #
 # Copyright 2012-2022 Alejandro Autalán
 #
@@ -14,10 +13,17 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['PropertyEditor', 'EntryPropertyEditor', 'SpinboxPropertyEditor',
-           'ChoicePropertyEditor', 'ChoiceByKeyPropertyEditor',
-           'TextPropertyEditor', 'CheckbuttonPropertyEditor',
-           'register_editor', 'create_editor']
+__all__ = [
+    'PropertyEditor',
+    'EntryPropertyEditor',
+    'SpinboxPropertyEditor',
+    'ChoicePropertyEditor',
+    'ChoiceByKeyPropertyEditor',
+    'TextPropertyEditor',
+    'CheckbuttonPropertyEditor',
+    'register_editor',
+    'create_editor',
+]
 
 import keyword
 import re
@@ -43,6 +49,15 @@ def create_editor(name, *args, **kw):
 class PropertyEditor(ttk.Frame):
     style_initialized = False
 
+    global_validator = None
+
+    @classmethod
+    def is_valid_globally(cls, value):
+        result = True
+        if callable(cls.global_validator):
+            result = cls.global_validator(value)
+        return result
+
     def __init__(self, master=None, **kw):
         self._variable = tk.StringVar()
         self._initvalue = None
@@ -59,9 +74,7 @@ class PropertyEditor(ttk.Frame):
     def _on_keypress(self, event=None):
         if self._cbid is not None:
             self.after_cancel(self._cbid)
-        self._cbid = self.after(
-            KEY_PRESS_CB_MILISECONDS,
-            self._on_keypress_after)
+        self._cbid = self.after(KEY_PRESS_CB_MILISECONDS, self._on_keypress_after)
 
     def _on_keypress_after(self, event=None):
         self._on_variable_changed(event)
@@ -102,6 +115,7 @@ class PropertyEditor(ttk.Frame):
         pass
 
     def edit(self, value):
+        self.show_invalid(False)
         self._initvalue = value
         self.value = value
         self._set_value(value)
@@ -142,15 +156,8 @@ class AlphanumericEntryPropertyEditor(EntryPropertyEditor):
         return is_valid
 
 
-class IdentifierPropertyEditor(EntryPropertyEditor, object):
+class IdentifierPropertyEditor(EntryPropertyEditor):
     RE_IDENTIFIER = re.compile('[_A-Za-z][_a-zA-Z0-9]*$')
-
-    def __init__(self, master=None, **kw):
-        self.is_unique_cb = kw.pop('unique_cb', None)
-        super(IdentifierPropertyEditor, self).__init__(master, **kw)
-
-    def set_unique_cb(self, callback):
-        self.is_unique_cb = callback
 
     def _validate(self):
         is_valid = True
@@ -161,9 +168,8 @@ class IdentifierPropertyEditor(EntryPropertyEditor, object):
             if is_valid and not self.RE_IDENTIFIER.match(value):
                 is_valid = False
             # Check if new id is unique
-            if is_valid and self.is_unique_cb is not None:
-                if value != self._initvalue:
-                    is_valid = self.is_unique_cb(value)
+            if is_valid and value != self._initvalue:
+                is_valid = self.is_valid_globally(value)
         else:
             # ID must have at least one character
             is_valid = False
@@ -174,13 +180,15 @@ class IdentifierPropertyEditor(EntryPropertyEditor, object):
 SpinboxClass = tk.Spinbox
 if tk.TkVersion >= 8.6 and not hasattr(ttk, 'Spinbox'):
     from pygubu.widgets.ttkspinbox import Spinbox
+
     SpinboxClass = Spinbox
 
 
 class SpinboxPropertyEditor(PropertyEditor):
     def _create_ui(self):
-        self._spinbox = SpinboxClass(self, textvariable=self._variable,
-                                     command=self._on_variable_changed)
+        self._spinbox = SpinboxClass(
+            self, textvariable=self._variable, command=self._on_variable_changed
+        )
         spinbox = self._spinbox
         spinbox.grid(sticky='we')
         self.rowconfigure(0, weight=1)
@@ -217,8 +225,7 @@ class TextPropertyEditor(PropertyEditor):
 class ChoicePropertyEditor(PropertyEditor):
     def _create_ui(self):
         self._cb_pending = False
-        self._combobox = combobox = ttk.Combobox(self,
-                                                 textvariable=self._variable)
+        self._combobox = combobox = ttk.Combobox(self, textvariable=self._variable)
         combobox.grid(sticky='we')
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -350,6 +357,7 @@ if __name__ == '__main__':
         def on_change_cb(event=None):
             print(editor.value)
             print(repr(editor.value))
+
         return on_change_cb
 
     editor = EntryPropertyEditor(root)

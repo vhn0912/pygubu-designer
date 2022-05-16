@@ -1,6 +1,5 @@
 # encoding: utf8
 import pathlib
-import tkinter as tk
 from tkinter import messagebox
 import pygubu
 
@@ -23,28 +22,38 @@ class Myapp:
         self.mainwindow.mainloop()
 
     def on_button_clicked(self):
-        messagebox.showinfo('From callback', 'Button clicked !!')
+        messagebox.showinfo('From callback',
+                            'Button clicked !!',
+                            parent=self.mainwindow)
 
-    def validate_number(self, P):
+    def validate_number(self, p):
         print('On validate number')
-        value = str(P)
+        value = str(p)
         return value == '' or value.isnumeric()
 
     def entry_invalid(self):
-        messagebox.showinfo('Title', 'Invalid entry input')
+        messagebox.showinfo('Title',
+                            'Invalid entry input',
+                            parent=self.mainwindow)
 
     def radiobutton_command(self):
-        messagebox.showinfo('Title', 'Radiobutton command')
+        messagebox.showinfo('Title',
+                            'Radiobutton command',
+                            parent=self.mainwindow)
 
     def checkbutton_command(self):
-        messagebox.showinfo('Title', 'Checkbutton command')
+        messagebox.showinfo('Title',
+                            'Checkbutton command',
+                            parent=self.mainwindow)
 
     def on_scale1_changed(self, event):
+        print(event)
         label = self.builder.get_object('scale1label')
         scale = self.builder.get_object('scale1')
         label.configure(text=scale.get())
 
     def on_scale2_changed(self, event):
+        print(event)
         label = self.builder.get_object('scale2label')
         scale = self.builder.get_object('scale2')
         label.configure(text=int(scale.get()))
@@ -68,25 +77,31 @@ class Myapp:
             messagebox.showinfo('Title', 'Spinbox command')
         self.mainwindow.after_idle(showmessage)
 
-    def on_combobox_validate(self, P):
-        value = str(P)
+    def on_combobox_validate(self, p):
+        value = str(p)
         return value == '' or value.isnumeric()
 
-    def on_combobox_invalid(self, P):
-        messagebox.showinfo('Title', 'Invalid combobox input')
+    def on_combobox_invalid(self, p):
+        messagebox.showinfo('Title',
+                            f'Invalid combobox input: {p}',
+                            parent=self.mainwindow)
 
     def on_combobox_postcmd(self):
-        messagebox.showinfo('Title', 'Combobox postcommand')
+        messagebox.showinfo('Title',
+                            'Combobox postcommand',
+                            parent=self.mainwindow)
 
     def on_menuitem_clicked(self, itemid):
         messagebox.showinfo('Title',
-                            'Menu item "{0}" was clicked'.format(itemid))
+                            f'Menu item "{itemid}" was clicked',
+                            parent=self.mainwindow)
 
     def on_menuitem2_clicked(self):
-        messagebox.showinfo('Title', 'Callback on_menuitem2_clicked')
+        messagebox.showinfo('Title',
+                            'Callback on_menuitem2_clicked',
+                            parent=self.mainwindow)
 
 
 if __name__ == '__main__':
     app = Myapp()
     app.run()
-

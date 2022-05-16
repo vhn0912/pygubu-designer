@@ -1,6 +1,20 @@
 History
 =======
 
+Changes for next release
+
+  * Add option to center the toplevel preview window. PR #124 @jrezai
+
+Changes for version 0.26.1
+
+  * Hot fix: Error when loading old UI files. issue #123
+  
+Changes for version 0.26
+
+  * Fix name collisions between widget ids, variables and commands. #115
+  * Fix issue with Delete key in macOS. #119
+  * Fix wiki links. #118
+
 Changes for version 0.25
 
   * Make more intuitive design screen labels. #87

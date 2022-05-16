@@ -1,12 +1,8 @@
-#file: myapp.py
+# file: myapp.py
 import sys
 import os
 import random
 import math
-
-import tkinter as tk
-import tkinter.messagebox
-import tkinter.ttk as ttk
 
 import pygubu
 
@@ -31,7 +27,7 @@ class MyApplication:
         self.mainwindow = b.get_object('mainwindow')
         self.mainmenu = b.get_object('mainmenu', self.mainwindow)
         self.btn_menu = b.get_object('btn_menu')
-        #self.mainwindow['menu'] = menu
+        # self.mainwindow['menu'] = menu
         self.canvas = b.get_object('main_canvas')
 
         # Connect to Delete event
@@ -85,6 +81,7 @@ class MyApplication:
         self._draw_figure('triangle')
 
     def quit(self, event=None):
+        print(event)
         self.mainwindow.quit()
 
     def run(self):
@@ -128,7 +125,8 @@ class MyApplication:
         coords = self.__regpoly_coords(x0, y0, x1, y1, sides, start, extent)
         return self.canvas.create_polygon(*coords, **kw)
 
-    def __regpoly_coords(self, x0, y0, x1, y1, sides, start, extent):
+    @staticmethod
+    def __regpoly_coords(x0, y0, x1, y1, sides, start, extent):
         """Create the coordinates of the regular polygon specified"""
 
         coords = []
@@ -156,6 +154,7 @@ class MyApplication:
         numsteps_int = int(numsteps)
 
         i = 0
+        x = y = 0
         while i < numsteps_int:
             rad = (start - i * step) * DEG2RAD
             x = rx * math.cos(rad)
@@ -187,4 +186,3 @@ class MyApplication:
 if __name__ == '__main__':
     app = MyApplication()
     app.run()
-

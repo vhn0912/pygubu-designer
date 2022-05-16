@@ -1,6 +1,5 @@
 # encoding: utf8
 import pathlib
-import tkinter as tk
 from tkinter import messagebox
 import pygubu
 
@@ -25,10 +24,14 @@ class Myapp:
         builder.connect_callbacks(callbacks)
 
     def on_my_button_clicked(self):
-        messagebox.showinfo('From callback', 'My button was clicked !!')
+        messagebox.showinfo('From callback',
+                            'My button was clicked !!',
+                            parent=self.mainwindow)
 
     def on_button2_clicked(self):
-        messagebox.showinfo('From callback', 'Button 2 was clicked !!')
+        messagebox.showinfo('From callback',
+                            'Button 2 was clicked !!',
+                            parent=self.mainwindow)
 
     def run(self):
         self.mainwindow.mainloop()
@@ -37,4 +40,3 @@ class Myapp:
 if __name__ == '__main__':
     app = Myapp()
     app.run()
-

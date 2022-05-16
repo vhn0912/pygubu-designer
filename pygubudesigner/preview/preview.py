@@ -1,4 +1,3 @@
-# encoding: UTF-8
 #
 # Copyright 2012-2022 Alejandro Autalán
 #
@@ -19,23 +18,25 @@ import re
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk
+
 import pygubu
+import screeninfo
 
 from pygubudesigner.widgetdescr import WidgetMeta
 from pygubudesigner.widgets.toplevelframe import ToplevelFramePreview
 
 from .builder import BuilderForPreview
 
-
 logger = logging.getLogger(__name__)
 
 RE_FONT = re.compile(
-    "(?P<family>\\{\\w+(\\w|\\s)*\\}|\\w+)\\s?(?P<size>-?\\d+)?\\s?(?P<modifiers>\\{\\w+(\\w|\\s)*\\}|\\w+)?")
+    "(?P<family>\\{\\w+(\\w|\\s)*\\}|\\w+)\\s?(?P<size>-?\\d+)?\\s?(?P<modifiers>\\{\\w+(\\w|\\s)*\\}|\\w+)?"
+)
 
 
-class Preview(object):
+class Preview:
     def __init__(self, id_, canvas, x=0, y=0, rpaths=None):
-        self.id = 'preview_{0}'.format(id_)
+        self.id = f'preview_{id_}'
         self.x = x
         self.y = y
         self.w = 10
@@ -70,19 +71,15 @@ class Preview(object):
         # Preview box
         c = self.canvas
         x, y, x2, y2 = (-1001, -1000, -1001, -1000)
-        s1 = c.create_rectangle(x, y, x2, y2,
-                                width=2, outline='blue', tags=self.id)
-        s2 = c.create_rectangle(x, y, x2, y2, fill='blue', outline='blue',
-                                tags=(self.id, 'resizer'))
-        s3 = c.create_text(x, y, text='widget_id', anchor=tk.NW,
-                           fill='white', tags=self.id)
+        s1 = c.create_rectangle(x, y, x2, y2, width=2, outline='blue', tags=self.id)
+        s2 = c.create_rectangle(
+            x, y, x2, y2, fill='blue', outline='blue', tags=(self.id, 'resizer')
+        )
+        s3 = c.create_text(
+            x, y, text='widget_id', anchor=tk.NW, fill='white', tags=self.id
+        )
         s4 = c.create_window(x, y, anchor=tk.NW, tags=self.id)
-        self.shapes = {
-            'outline': s1,
-            'resizer': s2,
-            'text': s3,
-            'window': s4
-        }
+        self.shapes = {'outline': s1, 'resizer': s2, 'text': s3, 'window': s4}
         self.draw()
 
     def erase(self):
@@ -144,13 +141,14 @@ class Preview(object):
 
         # Create preview
         canvas_window = ttk.Frame(self.canvas, style='PreviewFrame.TFrame')
-        #canvas_window.rowconfigure(0, weight=1)
-        #canvas_window.columnconfigure(0, weight=1)
+        # canvas_window.rowconfigure(0, weight=1)
+        # canvas_window.columnconfigure(0, weight=1)
 
         self.canvas.itemconfigure(self.shapes['text'], text=widget_id)
 
-        self._preview_widget = \
-            self.create_preview_widget(canvas_window, widget_id, uidefinition)
+        self._preview_widget = self.create_preview_widget(
+            canvas_window, widget_id, uidefinition
+        )
         self.root_widget = self._preview_widget
 
         self.canvas_window = canvas_window
@@ -194,9 +192,112 @@ class Preview(object):
     def _get_wreqheight(self):
         return self._preview_widget.winfo_reqheight()
 
+    @staticmethod
+    def center_window_active_monitor(window: tk.Toplevel) -> bool:
+        """
+        Center the given window on the monitor that the user's mouse pointer is on.
+
+        For example: if the mouse pointer is on the second monitor, then center
+        the given window on the second monitor.
+
+        Arguments:
+        - window: a toplevel window that we want to center
+
+        Returns: bool
+        True : if the center calculations were done successfully and the window
+        has been centered on a monitor.
+
+        False : if for some reason the mouse pointer wasn't found on any of the monitors (shouldn't happen).
+        """
+
+        # We need to call the update_idletasks() method before we try and get the window's size,
+        # because if the window hasn't been drawn on the screen yet, we won't get the proper dimensions
+        # when we try and use winfo_width() and winfo_height().
+        # After we run .update_idletasks(), then winfo_width() and winfo_height()
+        # will work as expected.
+        window.update_idletasks()
+
+        # Hide the toplevel window for now (it will help to minimize flickering when it
+        # moves to its center position later on)
+        window.withdraw()
+
+        # Get a list of monitors
+        monitors = screeninfo.get_monitors()
+
+        mon_sizes = []
+        combined_width_so_far = 0
+
+        # Get a list of widths for each monitor.
+        # For example, if there are 2 monitors (each 1920x1080),
+        # then find out the width of each (incrementing over to the next).
+        # Example: first monitor: 0 to 1920 (width), second monitor: 1921x3840
+
+        # We will need to create a tuple that looks like this:
+        # (from_x, to_x, center_x, center_y)
+
+        # 'from_x' and 'to_x' represent a monitor's width from 'from_x' to 'to_x'.
+        # For example: if the first monitor is 1920 pixels wide, then 'from_x' will be 0, and 'to_x' will be 1920.
+
+        # Then, if the second monitor is also 1920 pixels wide, then for the second monitor,
+        # 'from_x' will be 1921, to_x' will be 3840.
+
+        # So if the mouse pointer's X position is within that monitor's 'from_x' to 'to_x', then we will consider
+        # the mouse pointer to be inside that monitor (because the mouse pointer's X was inside the 'from_x'
+        # and 'to_x' of that monitor's tuple value).
+
+        # center_x, center_y are the center width and center height, respectively,
+        # of the single monitor that the mouse pointer is in.
+
+        # Enumerate over each monitor
+        for idx, m in enumerate(monitors):
+
+            # If it's the first monitor, then we don't need to add +1 for the first '_from_x'
+            if idx == 0:
+                _from = 0
+                _to = m.width
+            else:
+                # Add a +1 so that it continues 1 pixel more for the next monitor, so that two monitors don't overlap.
+                _from = combined_width_so_far + 1
+                _to = combined_width_so_far + m.width
+
+            # Get the center x and y of the current monitor we're looping on.
+            center_x = combined_width_so_far + (m.width // 2)
+            center_y = m.height // 2
+
+            # We will use this later to find out which of these monitors the specified window is in.
+            mon_sizes.append((_from, _to, center_x, center_y))
+
+            # As we continue enumerating over each monitor, the 'from_x' has to continue
+            # where the last monitor's width left off.
+
+            # So we keep summing up the width of each monitor that we enumerate so the
+            # next monitor can start its 'from_x', where the last monitor's width ended, + 1.
+            combined_width_so_far += m.width
+
+        # Find the X position of the mouse pointer.
+        # If there are multiple monitors, in Windows it will have a combined width X position.
+        mouse_pointer_x = window.winfo_pointerx()
+
+        # Find out which monitor (width-range) the X of the window is on, then center it based on that.
+        for size_range in mon_sizes:
+
+            # Is the mouse pointer inside the current monitor in the loop?
+            if size_range[0] <= mouse_pointer_x <= size_range[1]:
+                win_x_center = size_range[2] - (window.winfo_width() // 2)
+                win_y_center = size_range[3] - (window.winfo_height() // 2)
+
+                # Center the window
+                window.geometry(f"+{win_x_center}+{win_y_center}")
+
+                # Now show the toplevel window, because we're done centering it.
+                window.deiconify()
+
+                return True
+        else:
+            return False
+
 
 class DefaultMenuPreview(Preview):
-
     def create_preview_widget(self, parent, widget_id, uidefinition):
         self.builder = self._create_builder()
         self.builder.uidefinition = uidefinition
@@ -226,7 +327,7 @@ class OnCanvasMenuPreview(Preview):
     fonts = {}
 
     def __init__(self, id_, canvas, x=0, y=0, rpaths=None):
-        super(OnCanvasMenuPreview, self).__init__(id_, canvas, x, y, rpaths)
+        super().__init__(id_, canvas, x, y, rpaths)
         self._menu = None
         self._cwidth = 0
         self._cheight = 0
@@ -263,15 +364,20 @@ class OnCanvasMenuPreview(Preview):
             slant = 'italic' if 'italic' in modifiers else 'roman'
             underline = '1' if 'underline' in modifiers else '0'
             overstrike = '1' if 'overstrike' in modifiers else '0'
-            kw = {'family': family, 'weight': weight, 'slant': slant,
-                  'underline': underline, 'overstrike': overstrike}
+            kw = {
+                'family': family,
+                'weight': weight,
+                'slant': slant,
+                'underline': underline,
+                'overstrike': overstrike,
+            }
             if size:
                 kw['size'] = size
             OnCanvasMenuPreview.fonts[fontname] = tk.font.Font(**kw)
         return OnCanvasMenuPreview.fonts[fontname]
 
     def _calculate_menu_wh(self):
-        """ Calculate menu widht and height."""
+        """Calculate menu widht and height."""
         w = iw = 50
         h = ih = 0
         # menu.index returns None if there are no choices
@@ -344,18 +450,16 @@ if sys.platform == 'linux':
 
 
 class ToplevelPreview(Preview):
-
     def create_preview_widget(self, parent, widget_id, uidefinition):
         # Change real Toplevel for a preview replacement:
         # Add same behavior of Toplevel. Default expand both sides:
         old = uidefinition.get_widget(widget_id)
-        newroot = WidgetMeta('pygubudesigner.ToplevelFramePreview',
-                             widget_id, 'pack')
+        newroot = WidgetMeta('pygubudesigner.ToplevelFramePreview', widget_id, 'pack')
         newroot.copy_properties(old)
         # FIX: Why is not copying in the above function ???
         newroot.gridrc_properties = old.gridrc_properties
-        #newroot.widget_property('height', '200')
-        #newroot.widget_property('width', '200')
+        # newroot.widget_property('height', '200')
+        # newroot.widget_property('width', '200')
         newroot.layout_property('expand', 'true')
         newroot.layout_property('fill', 'both')
 
@@ -377,9 +481,6 @@ class ToplevelPreview(Preview):
 
 class DialogPreview(ToplevelPreview):
     def create_toplevel(self, widget_id, uidefinition):
-        top = super(DialogPreview, self).create_toplevel(widget_id,
-                                                         uidefinition)
+        top = super().create_toplevel(widget_id, uidefinition)
         top.run()
         return top
-
-

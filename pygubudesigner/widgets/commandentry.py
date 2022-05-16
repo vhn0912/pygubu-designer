@@ -1,4 +1,3 @@
-# encoding: UTF-8
 #
 # Copyright 2012-2022 Alejandro Autalán
 #
@@ -24,8 +23,11 @@ from pygubu.builder.builderobject import CB_TYPES
 
 from pygubudesigner.i18n import translator as _
 from pygubudesigner.widgets.propertyeditor import (
-    PropertyEditor, register_editor, EntryPropertyEditor,
-    ChoiceByKeyPropertyEditor)
+    ChoiceByKeyPropertyEditor,
+    EntryPropertyEditor,
+    PropertyEditor,
+    register_editor,
+)
 
 
 class CommandPropertyBase(PropertyEditor):
@@ -64,7 +66,7 @@ class SimpleCommandEntry(CommandPropertyBase):
             cmd = {
                 'type': 'command',
                 'value': self._cbname.value,
-                'cbtype': self.cmd_type
+                'cbtype': self.cmd_type,
             }
             value = json.dumps(cmd)
         return value
@@ -73,7 +75,7 @@ class SimpleCommandEntry(CommandPropertyBase):
         is_valid = True
         value = self._cbname.value
         if len(value) != 0:
-            is_valid = self.is_safe_identifier(value)
+            is_valid = self.is_safe_identifier(value) and self.is_valid_globally(value)
         self.show_invalid(not is_valid)
         return is_valid
 
@@ -97,11 +99,11 @@ register_editor('scalecommandentry', ScaleCommandEntry)
 
 
 class CommandPropertyEditor(CommandPropertyBase):
-
     def _create_ui(self):
         self._lbl_callback = _('Callback:')
-        self._plabel = w = ttk.Label(self, text=self._lbl_callback,
-                                     font='TkSmallCaptionFont')
+        self._plabel = w = ttk.Label(
+            self, text=self._lbl_callback, font='TkSmallCaptionFont'
+        )
         w.grid(row=0, column=0, sticky='nswe')
 
         self._cbname = w = EntryPropertyEditor(self)
@@ -139,7 +141,7 @@ class CommandPropertyEditor(CommandPropertyBase):
             cmd = {
                 'type': 'command',
                 'value': self._cbname.value,
-                'cbtype': self._cmdtype.value
+                'cbtype': self._cmdtype.value,
             }
             value = json.dumps(cmd)
         return value
@@ -148,7 +150,7 @@ class CommandPropertyEditor(CommandPropertyBase):
         is_valid = True
         value = self._cbname.value
         if len(value) != 0:
-            is_valid = self.is_safe_identifier(value)
+            is_valid = self.is_safe_identifier(value) and self.is_valid_globally(value)
         self.show_invalid(not is_valid)
         return is_valid
 
