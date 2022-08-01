@@ -18,23 +18,24 @@ import locale
 import os
 import sys
 from pathlib import Path
+import pygubu.i18n as pygubu_i18n
 
 # Change this variable to your app name!
 #  The translation files will be under
 #  @LOCALE_DIR@/@LANGUAGE@/LC_MESSAGES/@APP_NAME@.mo
 #
-APP_NAME = "pygubu"
+APP_NAME = "pygubu-designer"
 
 # Not sure in a regular desktop:
 
 APP_DIR = Path(__file__).parent
 LOCALE_DIR = APP_DIR / "locale"
 
-if not (LOCALE_DIR / "de" / "LC_MESSAGES" / "pygubu.mo").exists():
+if not (LOCALE_DIR / "de" / "LC_MESSAGES" / "pygubu-designer.mo").exists():
     print(
-        'You should compile the .po files in the pygubudesigner/locale '
-        + 'directory first if you are a developer, otherwise give us feedback '
-        + 'here: https://github.com/alejandroautalan/pygubu-designer/issues'
+        "You should compile the .po files in the pygubudesigner/locale "
+        + "directory first if you are a developer, otherwise give us feedback "
+        + "here: https://github.com/alejandroautalan/pygubu-designer/issues"
     )
     sys.exit(0)
 
@@ -44,7 +45,7 @@ if not (LOCALE_DIR / "de" / "LC_MESSAGES" / "pygubu.mo").exists():
 #  In maemo it is in the LANG environment variable
 #  (on desktop is usually LANGUAGES)
 #
-DEFAULT_LANGUAGES = os.environ.get('LANG', '').split(':')
+DEFAULT_LANGUAGES = os.environ.get("LANG", "").split(":")
 
 # Try to get the languages from the default locale
 languages = []
@@ -55,7 +56,7 @@ if lc:
 # Concat all languages (env + default locale),
 #  and here we have the languages and location of the translations
 #
-languages = DEFAULT_LANGUAGES + languages + ['en_US']
+languages = DEFAULT_LANGUAGES + languages + ["en_US"]
 mo_location = LOCALE_DIR
 
 # Lets tell those details to gettext
@@ -67,11 +68,11 @@ language = gettext.translation(
     APP_NAME, mo_location, languages=languages, fallback=True
 )
 
-translator = language.gettext
+_ = T = translator = language.gettext
 
 
-# And now in your modules you can do:
-#
-# import i18n
-# _ = i18n.translator
-#
+# Setup pygubu translations
+pygubu_app = gettext.translation(
+    "pygubu", mo_location, languages=languages, fallback=True
+)
+pygubu_i18n.setup_translator(pygubu_app.gettext)
