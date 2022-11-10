@@ -15,7 +15,9 @@ designer.wpr
 designer.wpu
 *.egg-info*
 *.kdev4
+*.wpr
+*.pyz
 
-# *.mo don't need to be committed
-*.mo
-
+# *.mo don't need to be committed, but are included back again to
+#      easy the installation from a git branch.
+# *.mo  
